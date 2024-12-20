@@ -6,36 +6,37 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 	"math/rand"
 	"net/http"
-
-	"github.com/mkorolyov/go-eth-tx-parser/pkg/logger"
+	"os"
 )
-
-type Client interface {
-	GetBlockNumber(ctx context.Context) (int, error)
-	GetBlockByNumber(ctx context.Context, blockNumber int) (EthereumBlock, error)
-}
 
 // JsonRPCClient interacts with the Ethereum JSON-RPC endpoint
 type JsonRPCClient struct {
 	endpoint string
-	http     http.Client
-	log      logger.Logger
+	http     *http.Client
+	log      *slog.Logger
 }
 
 type Option func(*JsonRPCClient)
 
-func WithHTTPClient(http http.Client) Option {
+func WithHTTPClient(http *http.Client) Option {
 	return func(c *JsonRPCClient) {
 		c.http = http
+	}
+}
+
+func WithLog(log *slog.Logger) Option {
+	return func(c *JsonRPCClient) {
+		c.log = log
 	}
 }
 
 const defaultEndpoint = "https://ethereum-rpc.publicnode.com"
 
 func NewJsonRPCClient(options ...Option) JsonRPCClient {
-	c := JsonRPCClient{endpoint: defaultEndpoint, log: logger.DefaultLogger}
+	c := JsonRPCClient{endpoint: defaultEndpoint, log: slog.New(slog.NewJSONHandler(os.Stdout, nil))}
 
 	for _, option := range options {
 		option(&c)
@@ -69,7 +70,7 @@ func (c JsonRPCClient) GetBlockNumber(ctx context.Context) (int, error) {
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
-			c.log.Errorf("failed to close http response body: %v", err)
+			c.log.Error("failed to close http response body", "error", err)
 		}
 	}()
 
@@ -120,7 +121,7 @@ func (c JsonRPCClient) GetBlockByNumber(ctx context.Context, blockNumber int) (E
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
-			c.log.Errorf("failed to close http response body: %v", err)
+			c.log.Error("failed to close http response body", "error", err)
 		}
 	}()
 

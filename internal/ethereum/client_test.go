@@ -20,7 +20,7 @@ func (m *MockHttpTransport) RoundTrip(req *http.Request) (*http.Response, error)
 }
 
 func TestEthClient_GetBlockNumberSmoke(t *testing.T) {
-	client := NewJsonRPCClient()
+	client := NewJsonRPCClient(WithHTTPClient(&http.Client{}))
 
 	blockNumber, err := client.GetBlockNumber(context.Background())
 	if err != nil {
@@ -34,7 +34,7 @@ func TestEthClient_GetBlockNumberSmoke(t *testing.T) {
 
 func TestEthClient_GetBlockNumber(t *testing.T) {
 	mockHTTPTransport := &MockHttpTransport{}
-	client := NewJsonRPCClient(WithHTTPClient(http.Client{Transport: mockHTTPTransport}))
+	client := NewJsonRPCClient(WithHTTPClient(&http.Client{Transport: mockHTTPTransport}))
 
 	randId := rand.Int()
 	ctx := context.Background()
@@ -100,7 +100,7 @@ func TestEthClient_GetBlockNumber(t *testing.T) {
 }
 
 func TestEthClient_GetBlockByNumberSmoke(t *testing.T) {
-	client := NewJsonRPCClient()
+	client := NewJsonRPCClient(WithHTTPClient(&http.Client{}))
 	ctx := context.Background()
 
 	blockNumber, err := client.GetBlockNumber(ctx)
@@ -120,7 +120,7 @@ func TestEthClient_GetBlockByNumberSmoke(t *testing.T) {
 
 func TestGetBlockByNumber(t *testing.T) {
 	mockHTTPTransport := &MockHttpTransport{}
-	client := NewJsonRPCClient(WithHTTPClient(http.Client{Transport: mockHTTPTransport}))
+	client := NewJsonRPCClient(WithHTTPClient(&http.Client{Transport: mockHTTPTransport}))
 	ctx := context.Background()
 	blockNumber := 69007
 

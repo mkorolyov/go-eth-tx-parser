@@ -1,13 +1,13 @@
-package parser
+package poller
 
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"testing"
 	"time"
 
-	"github.com/mkorolyov/go-eth-tx-parser/pkg/ethereum"
-	"github.com/mkorolyov/go-eth-tx-parser/pkg/logger"
+	"github.com/mkorolyov/go-eth-tx-parser/internal/ethereum"
 )
 
 func TestStartPooling(t *testing.T) {
@@ -15,14 +15,13 @@ func TestStartPooling(t *testing.T) {
 	mockBlocksStorage := &MockBlocksStorage{}
 	mockAddressesStorage := &MockAddressesStorage{}
 	mockTransactionsStorage := &MockTransactionsStorage{}
-	mockLogger := logger.DefaultLogger
 
-	observer := Observer{
+	observer := TransactionPoller{
 		ethClient:           mockEthClient,
 		blocksStorage:       mockBlocksStorage,
 		addressesStorage:    mockAddressesStorage,
 		transactionsStorage: mockTransactionsStorage,
-		log:                 mockLogger,
+		log:                 slog.Default(),
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -44,7 +43,7 @@ func TestStartPooling(t *testing.T) {
 		go func() {
 			cancel()
 		}()
-		observer.StartPooling(ctx)
+		observer.Start(ctx)
 	})
 
 	t.Run("error fetching latest block", func(t *testing.T) {
@@ -55,7 +54,7 @@ func TestStartPooling(t *testing.T) {
 			time.Sleep(time.Second * 1)
 			cancel()
 		}()
-		observer.StartPooling(ctx)
+		observer.Start(ctx)
 	})
 
 	t.Run("successful pooling", func(t *testing.T) {
@@ -81,7 +80,7 @@ func TestStartPooling(t *testing.T) {
 			time.Sleep(time.Second * 1)
 			cancel()
 		}()
-		observer.StartPooling(ctx)
+		observer.Start(ctx)
 	})
 }
 
@@ -90,14 +89,14 @@ func TestLoadNewTransactions(t *testing.T) {
 	mockBlocksStorage := &MockBlocksStorage{}
 	mockAddressesStorage := &MockAddressesStorage{}
 	mockTransactionsStorage := &MockTransactionsStorage{}
-	mockLogger := logger.DefaultLogger
+	logger := slog.Default()
 
-	observer := Observer{
+	observer := TransactionPoller{
 		ethClient:           mockEthClient,
 		blocksStorage:       mockBlocksStorage,
 		addressesStorage:    mockAddressesStorage,
 		transactionsStorage: mockTransactionsStorage,
-		log:                 mockLogger,
+		log:                 logger,
 	}
 
 	ctx := context.Background()
@@ -185,12 +184,12 @@ func TestLoadNewTransactions(t *testing.T) {
 func TestSaveTxForAddress(t *testing.T) {
 	mockTransactionsStorage := &MockTransactionsStorage{}
 	mockAddressesStorage := &MockAddressesStorage{}
-	mockLogger := logger.DefaultLogger
+	logger := slog.Default()
 
-	observer := Observer{
+	observer := TransactionPoller{
 		transactionsStorage: mockTransactionsStorage,
 		addressesStorage:    mockAddressesStorage,
-		log:                 mockLogger,
+		log:                 logger,
 	}
 
 	ctx := context.Background()

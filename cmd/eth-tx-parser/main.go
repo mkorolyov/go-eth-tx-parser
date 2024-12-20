@@ -2,14 +2,15 @@ package main
 
 import (
 	"context"
+	"log/slog"
+	"net/http"
 	"os"
 	"os/signal"
 
-	"github.com/mkorolyov/go-eth-tx-parser/pkg/ethereum"
-	"github.com/mkorolyov/go-eth-tx-parser/pkg/http"
-	"github.com/mkorolyov/go-eth-tx-parser/pkg/logger"
-	"github.com/mkorolyov/go-eth-tx-parser/pkg/parser"
-	"github.com/mkorolyov/go-eth-tx-parser/pkg/storage"
+	"github.com/mkorolyov/go-eth-tx-parser/internal/ethereum"
+	"github.com/mkorolyov/go-eth-tx-parser/internal/poller"
+	"github.com/mkorolyov/go-eth-tx-parser/internal/storage"
+	"github.com/mkorolyov/go-eth-tx-parser/pkg/server"
 )
 
 func main() {
@@ -17,23 +18,26 @@ func main() {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
 
-	ethClient := ethereum.NewJsonRPCClient()
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	ethClient := ethereum.NewJsonRPCClient(ethereum.WithHTTPClient(&http.Client{}), ethereum.WithLog(logger))
 	inMemStorage := storage.NewInMemoryStorage()
-	log := logger.DefaultLogger
-	observer := parser.NewObserver(inMemStorage, inMemStorage, inMemStorage, ethClient, log)
+	transactionPoller := poller.NewTransactionPoller(inMemStorage, inMemStorage, inMemStorage, ethClient, logger)
 
 	// Start polling for new transactions
-	go observer.StartPooling(ctx)
+	go transactionPoller.Start(ctx)
 
-	server := http.NewNaiveHTTPServer(observer, log)
+	server := server.NewNaiveHTTPServer(inMemStorage, logger)
 	go func() {
 		if err := server.ListenAndServe(); err != nil {
-			log.Infof("server stopped: %v", err)
+			logger.Info("server stopped", "error", err)
 		}
 	}()
 
 	<-ctx.Done()
-	log.Info("shutting down server...")
-	server.Shutdown(ctx)
-	log.Info("exiting...")
+	logger.Info("shutting down server...")
+	// ctx already closed but it is not a problem here
+	if err := server.Shutdown(ctx); err != nil {
+		logger.Error("shutdown server", "error", err)
+	}
+	logger.Info("exiting...")
 }

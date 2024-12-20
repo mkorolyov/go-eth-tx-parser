@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/mkorolyov/go-eth-tx-parser/pkg/ethereum"
+	"github.com/mkorolyov/go-eth-tx-parser/internal/ethereum"
 )
 
 // InMemoryStorage is a thread-safe in-memory storage for transactions
@@ -24,7 +24,7 @@ func NewInMemoryStorage() *InMemoryStorage {
 	}
 }
 
-// AddTransaction stores a transaction for an address
+// SaveTransaction AddTransaction stores a transaction for an address
 func (s *InMemoryStorage) SaveTransaction(_ context.Context, address string, tx ethereum.Transaction) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -32,7 +32,7 @@ func (s *InMemoryStorage) SaveTransaction(_ context.Context, address string, tx 
 	return nil
 }
 
-// GetTransactions fetches transactions for a given address
+// GetTransactions fetches transactions for a given address. Paging is not supported for simplicity
 func (s *InMemoryStorage) GetTransactions(_ context.Context, address string) ([]ethereum.Transaction, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()

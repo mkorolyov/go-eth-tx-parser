@@ -105,6 +105,7 @@ curl -X GET "http://localhost:8080/current_block"
 
 - This service uses in-memory storage (`NewInMemoryStorage`) for simplicity and demonstration purposes. For production, replace it with a persistent storage solution (e.g., a database).
 - This services uses most naive http server implementation. For production, consider using a more complex approach, with proper middlewares, logging, and error handling.
+- Makes sense to add paging to transactions reading endpoint to avoid memory exhaustion on the server side.
 
 ## License
 
