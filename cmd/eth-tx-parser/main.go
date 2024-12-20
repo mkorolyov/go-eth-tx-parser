@@ -9,8 +9,8 @@ import (
 
 	"github.com/mkorolyov/go-eth-tx-parser/internal/ethereum"
 	"github.com/mkorolyov/go-eth-tx-parser/internal/poller"
+	"github.com/mkorolyov/go-eth-tx-parser/internal/server"
 	"github.com/mkorolyov/go-eth-tx-parser/internal/storage"
-	"github.com/mkorolyov/go-eth-tx-parser/pkg/server"
 )
 
 func main() {
@@ -26,9 +26,9 @@ func main() {
 	// Start polling for new transactions
 	go transactionPoller.Start(ctx)
 
-	server := server.NewNaiveHTTPServer(inMemStorage, logger)
+	httpServer := server.NewNaiveHTTPServer(inMemStorage, logger)
 	go func() {
-		if err := server.ListenAndServe(); err != nil {
+		if err := httpServer.ListenAndServe(); err != nil {
 			logger.Info("server stopped", "error", err)
 		}
 	}()
@@ -36,7 +36,7 @@ func main() {
 	<-ctx.Done()
 	logger.Info("shutting down server...")
 	// ctx already closed but it is not a problem here
-	if err := server.Shutdown(ctx); err != nil {
+	if err := httpServer.Shutdown(ctx); err != nil {
 		logger.Error("shutdown server", "error", err)
 	}
 	logger.Info("exiting...")

@@ -13,7 +13,7 @@ import (
 type Parser interface {
 	// GetCurrentBlock returns last parsed block
 	// In the task methods where defined without error in response
-	// while here error was added to propogate possible errors underthehood
+	// while here error was added to propagate possible errors
 	GetCurrentBlock(ctx context.Context) (int, error)
 	// Subscribe add address to observer
 	Subscribe(ctx context.Context, address string) error
