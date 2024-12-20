@@ -3,7 +3,7 @@ package parser
 import (
 	"context"
 
-	"github.com/mkorolyov/go-eth-tx-parser/pkg/etherium"
+	"github.com/mkorolyov/go-eth-tx-parser/pkg/ethereum"
 )
 
 type Parser interface {
@@ -14,5 +14,5 @@ type Parser interface {
 	// add address to observer
 	Subscribe(ctx context.Context, address string) error
 	// list of inbound or outbound transactions for an address
-	GetTransactions(ctx context.Context, address string) ([]etherium.Transaction, error)
+	GetTransactions(ctx context.Context, address string) ([]ethereum.Transaction, error)
 }

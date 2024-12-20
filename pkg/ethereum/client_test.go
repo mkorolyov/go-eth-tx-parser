@@ -1,4 +1,4 @@
-package etherium
+package ethereum
 
 import (
 	"bytes"

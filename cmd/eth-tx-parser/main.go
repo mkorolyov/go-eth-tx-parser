@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/mkorolyov/go-eth-tx-parser/pkg/etherium"
+	"github.com/mkorolyov/go-eth-tx-parser/pkg/ethereum"
 	"github.com/mkorolyov/go-eth-tx-parser/pkg/http"
 	"github.com/mkorolyov/go-eth-tx-parser/pkg/logger"
 	"github.com/mkorolyov/go-eth-tx-parser/pkg/parser"
@@ -17,7 +17,7 @@ func main() {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
 
-	ethClient := etherium.NewJsonRPCClient()
+	ethClient := ethereum.NewJsonRPCClient()
 	inMemStorage := storage.NewInMemoryStorage()
 	log := logger.DefaultLogger
 	observer := parser.NewObserver(inMemStorage, inMemStorage, inMemStorage, ethClient, log)

@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mkorolyov/go-eth-tx-parser/pkg/etherium"
+	"github.com/mkorolyov/go-eth-tx-parser/pkg/ethereum"
 	"github.com/mkorolyov/go-eth-tx-parser/pkg/logger"
 )
 
@@ -35,8 +35,8 @@ func TestStartPooling(t *testing.T) {
 		mockBlocksStorage.GetCurrentBlockFunc = func(ctx context.Context) (int, error) {
 			return 0, nil
 		}
-		mockEthClient.GetBlockByNumberFunc = func(ctx context.Context, number int) (etherium.EthereumBlock, error) {
-			return etherium.EthereumBlock{}, nil
+		mockEthClient.GetBlockByNumberFunc = func(ctx context.Context, number int) (ethereum.EthereumBlock, error) {
+			return ethereum.EthereumBlock{}, nil
 		}
 		mockBlocksStorage.SetCurrentBlockFunc = func(ctx context.Context, number int) error {
 			return nil
@@ -65,13 +65,13 @@ func TestStartPooling(t *testing.T) {
 		mockBlocksStorage.GetCurrentBlockFunc = func(ctx context.Context) (int, error) {
 			return 99, nil
 		}
-		mockEthClient.GetBlockByNumberFunc = func(ctx context.Context, number int) (etherium.EthereumBlock, error) {
-			return etherium.EthereumBlock{Transactions: []etherium.Transaction{{Hash: "0x123"}}}, nil
+		mockEthClient.GetBlockByNumberFunc = func(ctx context.Context, number int) (ethereum.EthereumBlock, error) {
+			return ethereum.EthereumBlock{Transactions: []ethereum.Transaction{{Hash: "0x123"}}}, nil
 		}
 		mockAddressesStorage.IsSubscribedFunc = func(ctx context.Context, address string) (bool, error) {
 			return true, nil
 		}
-		mockTransactionsStorage.SaveTransactionFunc = func(ctx context.Context, address string, tx etherium.Transaction) error {
+		mockTransactionsStorage.SaveTransactionFunc = func(ctx context.Context, address string, tx ethereum.Transaction) error {
 			return nil
 		}
 		mockBlocksStorage.SetCurrentBlockFunc = func(ctx context.Context, number int) error {
@@ -128,8 +128,8 @@ func TestLoadNewTransactions(t *testing.T) {
 		mockBlocksStorage.GetCurrentBlockFunc = func(ctx context.Context) (int, error) {
 			return 99, nil
 		}
-		mockEthClient.GetBlockByNumberFunc = func(ctx context.Context, number int) (etherium.EthereumBlock, error) {
-			return etherium.EthereumBlock{}, errors.New("failed to load block")
+		mockEthClient.GetBlockByNumberFunc = func(ctx context.Context, number int) (ethereum.EthereumBlock, error) {
+			return ethereum.EthereumBlock{}, errors.New("failed to load block")
 		}
 
 		observer.loadNewTransactions(ctx)
@@ -142,13 +142,13 @@ func TestLoadNewTransactions(t *testing.T) {
 		mockBlocksStorage.GetCurrentBlockFunc = func(ctx context.Context) (int, error) {
 			return 99, nil
 		}
-		mockEthClient.GetBlockByNumberFunc = func(ctx context.Context, number int) (etherium.EthereumBlock, error) {
-			return etherium.EthereumBlock{Transactions: []etherium.Transaction{{Hash: "0x123"}}}, nil
+		mockEthClient.GetBlockByNumberFunc = func(ctx context.Context, number int) (ethereum.EthereumBlock, error) {
+			return ethereum.EthereumBlock{Transactions: []ethereum.Transaction{{Hash: "0x123"}}}, nil
 		}
 		mockAddressesStorage.IsSubscribedFunc = func(ctx context.Context, address string) (bool, error) {
 			return true, nil
 		}
-		mockTransactionsStorage.SaveTransactionFunc = func(ctx context.Context, address string, tx etherium.Transaction) error {
+		mockTransactionsStorage.SaveTransactionFunc = func(ctx context.Context, address string, tx ethereum.Transaction) error {
 			return nil
 		}
 		mockBlocksStorage.SetCurrentBlockFunc = func(ctx context.Context, number int) error {
@@ -165,13 +165,13 @@ func TestLoadNewTransactions(t *testing.T) {
 		mockBlocksStorage.GetCurrentBlockFunc = func(ctx context.Context) (int, error) {
 			return 99, nil
 		}
-		mockEthClient.GetBlockByNumberFunc = func(ctx context.Context, number int) (etherium.EthereumBlock, error) {
-			return etherium.EthereumBlock{Transactions: []etherium.Transaction{{Hash: "0x123"}}}, nil
+		mockEthClient.GetBlockByNumberFunc = func(ctx context.Context, number int) (ethereum.EthereumBlock, error) {
+			return ethereum.EthereumBlock{Transactions: []ethereum.Transaction{{Hash: "0x123"}}}, nil
 		}
 		mockAddressesStorage.IsSubscribedFunc = func(ctx context.Context, address string) (bool, error) {
 			return true, nil
 		}
-		mockTransactionsStorage.SaveTransactionFunc = func(ctx context.Context, address string, tx etherium.Transaction) error {
+		mockTransactionsStorage.SaveTransactionFunc = func(ctx context.Context, address string, tx ethereum.Transaction) error {
 			return nil
 		}
 		mockBlocksStorage.SetCurrentBlockFunc = func(ctx context.Context, number int) error {
@@ -194,7 +194,7 @@ func TestSaveTxForAddress(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	tx := etherium.Transaction{Hash: "0x123"}
+	tx := ethereum.Transaction{Hash: "0x123"}
 
 	t.Run("address not subscribed", func(t *testing.T) {
 		mockAddressesStorage.IsSubscribedFunc = func(ctx context.Context, address string) (bool, error) {
@@ -216,7 +216,7 @@ func TestSaveTxForAddress(t *testing.T) {
 		mockAddressesStorage.IsSubscribedFunc = func(ctx context.Context, address string) (bool, error) {
 			return true, nil
 		}
-		mockTransactionsStorage.SaveTransactionFunc = func(ctx context.Context, address string, tx etherium.Transaction) error {
+		mockTransactionsStorage.SaveTransactionFunc = func(ctx context.Context, address string, tx ethereum.Transaction) error {
 			return errors.New("save transaction error")
 		}
 
@@ -227,7 +227,7 @@ func TestSaveTxForAddress(t *testing.T) {
 		mockAddressesStorage.IsSubscribedFunc = func(ctx context.Context, address string) (bool, error) {
 			return true, nil
 		}
-		mockTransactionsStorage.SaveTransactionFunc = func(ctx context.Context, address string, tx etherium.Transaction) error {
+		mockTransactionsStorage.SaveTransactionFunc = func(ctx context.Context, address string, tx ethereum.Transaction) error {
 			return nil
 		}
 
@@ -236,15 +236,15 @@ func TestSaveTxForAddress(t *testing.T) {
 }
 
 type MockTransactionsStorage struct {
-	SaveTransactionFunc func(ctx context.Context, address string, tx etherium.Transaction) error
-	GetTransactionsFunc func(ctx context.Context, address string) ([]etherium.Transaction, error)
+	SaveTransactionFunc func(ctx context.Context, address string, tx ethereum.Transaction) error
+	GetTransactionsFunc func(ctx context.Context, address string) ([]ethereum.Transaction, error)
 }
 
-func (m *MockTransactionsStorage) SaveTransaction(ctx context.Context, address string, tx etherium.Transaction) error {
+func (m *MockTransactionsStorage) SaveTransaction(ctx context.Context, address string, tx ethereum.Transaction) error {
 	return m.SaveTransactionFunc(ctx, address, tx)
 }
 
-func (m *MockTransactionsStorage) GetTransactions(ctx context.Context, address string) ([]etherium.Transaction, error) {
+func (m *MockTransactionsStorage) GetTransactions(ctx context.Context, address string) ([]ethereum.Transaction, error) {
 	return m.GetTransactionsFunc(ctx, address)
 }
 
@@ -263,14 +263,14 @@ func (m *MockAddressesStorage) Subscribe(ctx context.Context, address string) er
 
 type MockEthClient struct {
 	GetBlockNumberFunc   func(ctx context.Context) (int, error)
-	GetBlockByNumberFunc func(ctx context.Context, number int) (etherium.EthereumBlock, error)
+	GetBlockByNumberFunc func(ctx context.Context, number int) (ethereum.EthereumBlock, error)
 }
 
 func (m *MockEthClient) GetBlockNumber(ctx context.Context) (int, error) {
 	return m.GetBlockNumberFunc(ctx)
 }
 
-func (m *MockEthClient) GetBlockByNumber(ctx context.Context, number int) (etherium.EthereumBlock, error) {
+func (m *MockEthClient) GetBlockByNumber(ctx context.Context, number int) (ethereum.EthereumBlock, error) {
 	return m.GetBlockByNumberFunc(ctx, number)
 }
 

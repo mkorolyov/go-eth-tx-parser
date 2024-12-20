@@ -3,12 +3,12 @@ package storage
 import (
 	"context"
 
-	"github.com/mkorolyov/go-eth-tx-parser/pkg/etherium"
+	"github.com/mkorolyov/go-eth-tx-parser/pkg/ethereum"
 )
 
 type Transactions interface {
-	SaveTransaction(ctx context.Context, address string, tx etherium.Transaction) error
-	GetTransactions(ctx context.Context, address string) ([]etherium.Transaction, error)
+	SaveTransaction(ctx context.Context, address string, tx ethereum.Transaction) error
+	GetTransactions(ctx context.Context, address string) ([]ethereum.Transaction, error)
 }
 
 type Addresses interface {

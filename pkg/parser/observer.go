@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/mkorolyov/go-eth-tx-parser/pkg/etherium"
+	"github.com/mkorolyov/go-eth-tx-parser/pkg/ethereum"
 	"github.com/mkorolyov/go-eth-tx-parser/pkg/logger"
 	"github.com/mkorolyov/go-eth-tx-parser/pkg/storage"
 )
@@ -13,7 +13,7 @@ func NewObserver(
 	transactionsStorage storage.Transactions,
 	addressesStorage storage.Addresses,
 	blocksStorage storage.Blocks,
-	ethClient etherium.Client,
+	ethClient ethereum.Client,
 	log logger.Logger,
 ) Observer {
 	return Observer{
@@ -29,7 +29,7 @@ type Observer struct {
 	transactionsStorage storage.Transactions
 	addressesStorage    storage.Addresses
 	blocksStorage       storage.Blocks
-	ethClient           etherium.Client
+	ethClient           ethereum.Client
 	log                 logger.Logger
 }
 
@@ -41,7 +41,7 @@ func (p Observer) Subscribe(ctx context.Context, address string) error {
 	return p.addressesStorage.Subscribe(ctx, address)
 }
 
-func (p Observer) GetTransactions(ctx context.Context, address string) ([]etherium.Transaction, error) {
+func (p Observer) GetTransactions(ctx context.Context, address string) ([]ethereum.Transaction, error) {
 	return p.transactionsStorage.GetTransactions(ctx, address)
 }
 
@@ -102,7 +102,7 @@ func (p Observer) loadNewTransactions(ctx context.Context) {
 	}
 }
 
-func (p Observer) saveTxForAddress(ctx context.Context, tx etherium.Transaction, address string) {
+func (p Observer) saveTxForAddress(ctx context.Context, tx ethereum.Transaction, address string) {
 	subscribed, err := p.addressesStorage.IsSubscribed(ctx, address)
 	if err != nil {
 		p.log.Errorf("failed to check if address %s is subscribed: %v", address, err)

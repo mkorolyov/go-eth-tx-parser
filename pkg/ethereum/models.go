@@ -1,4 +1,4 @@
-package etherium
+package ethereum
 
 // EthereumJSONRPCRequest models JSON-RPC requests
 type EthereumJSONRPCRequest struct {
