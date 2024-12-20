@@ -61,7 +61,7 @@ func (p TransactionPoller) Start(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			p.log.Info("stopping observer")
+			p.log.Info("stopping poller")
 			return
 		default:
 			p.loadNewTransactions(ctx)
