@@ -37,7 +37,7 @@ The server will start on `localhost:8080` by default.
 **Example:**
 
 ```bash
-curl -X POST "http://localhost:8080/subscribe/0x1234567890abcdef1234567890abcdef12345678"
+curl -X POST "http://localhost:8080/address/0x1234567890abcdef1234567890abcdef12345678/subscribe"
 ```
 
 ---
